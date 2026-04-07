@@ -34,6 +34,12 @@ st.markdown("""
         font-weight: 700;
     }
 
+    /* ── Genel Metin Rengi ── */
+    .stApp, .stApp p, .stApp span, .stApp div,
+    .stApp label, .stApp li, .stApp td, .stApp th {
+        color: #111111 !important;
+    }
+
     /* ── Metrik Kartları ── */
     div[data-testid="metric-container"] {
         background-color: #ffffff;
@@ -43,26 +49,36 @@ st.markdown("""
         box-shadow: 0 2px 8px rgba(74, 90, 30, 0.10);
     }
     div[data-testid="metric-container"] label {
-        color: #5c7a2a !important;
+        color: #111111 !important;
         font-weight: 600;
         font-size: 1rem;
     }
     div[data-testid="metric-container"] div[data-testid="stMetricValue"] {
-        color: #2d4a1e !important;
+        color: #111111 !important;
         font-size: 2rem !important;
         font-weight: 700;
     }
 
     /* ── Alt Başlıklar ── */
     h2, h3 {
-        color: #3b5e1e !important;
+        color: #111111 !important;
         border-left: 5px solid #7a9e4a;
         padding-left: 10px;
     }
 
     /* ── Ana Başlık ── */
     h1 {
-        color: #2d4a1e !important;
+        color: #111111 !important;
+    }
+
+    /* ── Markdown metinler ── */
+    .stMarkdown, .stMarkdown p, .stMarkdown span {
+        color: #111111 !important;
+    }
+
+    /* ── Uyarı & Hata Mesajları ── */
+    .stAlert p, .stAlert div, .stAlert span {
+        color: #111111 !important;
     }
 
     /* ── Tablo ── */
@@ -76,7 +92,7 @@ st.markdown("""
     .stDownloadButton > button,
     .stButton > button {
         background-color: #4a7c2a !important;
-        color: #f5f0e8 !important;
+        color: #ffffff !important;
         border: none !important;
         border-radius: 8px !important;
         font-weight: 600;
@@ -86,6 +102,7 @@ st.markdown("""
     .stDownloadButton > button:hover,
     .stButton > button:hover {
         background-color: #2d4a1e !important;
+        color: #ffffff !important;
     }
 
     /* ── Ayırıcı ── */
@@ -98,6 +115,7 @@ st.markdown("""
         border: 1px solid #7a9e4a !important;
         border-radius: 8px !important;
         background-color: #faf7f0 !important;
+        color: #111111 !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -190,7 +208,7 @@ if not firebase_admin._apps:
 # ---------------- VERİ YÜKLEME ----------------
 @st.cache_data(ttl=5)
 def load_data():
-    ref = db.reference("dht_history")
+    ref = db.reference("basil_sorted")
     return ref.get()
 
 data = load_data()
@@ -248,9 +266,9 @@ st.markdown(f"""
     align-items: center;
     gap: 12px;
 ">
-    <span style="font-size: 1rem; color: #5c7a2a; font-weight: 600;">Mevcut Toprak Durumu:</span>
+    <span style="font-size: 1rem; color: #111111; font-weight: 600;">Mevcut Toprak Durumu:</span>
     <span style="font-size: 1rem; font-weight: 700; color: {status_color};">{soil_status}</span>
-    <span style="margin-left: auto; font-size: 0.8rem; color: #8b9e7a;">
+    <span style="margin-left: auto; font-size: 0.8rem; color: #333333;">
         Son Güncelleme: {latest['time'].strftime('%Y-%m-%d %H:%M:%S')}
     </span>
 </div>
@@ -295,7 +313,7 @@ SOIL_BROWN  = "#8b6914"
 PLANT_GREEN = "#4a7c2a"
 PAPER_BG    = "#faf7f0"
 GRID_COLOR  = "#ddd5c0"
-FONT_COLOR  = "#2d4a1e"
+FONT_COLOR  = "#111111"
 
 CHART_LAYOUT = dict(
     paper_bgcolor = PAPER_BG,
@@ -438,7 +456,7 @@ st.markdown("""
     padding: 1rem;
     border-top: 1px solid #c5a96a;
     text-align: center;
-    color: #7a9e4a;
+    color: #111111;
     font-size: 0.85rem;
 ">
     🌱 Akıllı Toprak İzleme Sistemi &nbsp;|&nbsp; 
