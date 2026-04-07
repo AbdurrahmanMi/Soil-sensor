@@ -429,7 +429,7 @@ export_df = df_filtered[["time", "temperature", "moisture"]].copy()
 export_df["time"] = export_df["time"].dt.strftime("%Y-%m-%d %H:%M:%S")
 export_df.columns = ["time", "temperature", "moisture"]
 
-csv = export_df.to_csv(index=False, sep=";")
+csv = export_df.to_csv(index=False, sep=",")
 
 st.download_button(
     label="⬇ Download CSV",
