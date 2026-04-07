@@ -4,6 +4,7 @@ from firebase_admin import credentials, db
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import io
 from streamlit_autorefresh import st_autorefresh
 
 # ---------------- SAYFA AYARLARI ----------------
@@ -476,15 +477,20 @@ table_html = f"""
 st.markdown(table_html, unsafe_allow_html=True)
 
 # CSV İndir butonu
-export_df = df_filtered.copy()
-export_df["time"] = export_df["time"].dt.strftime("%Y-%m-%d %H:%M:%S")
-csv = export_df[["time", "temperature", "humidity"]].to_csv(index=False, sep=";")
+utput = io.StringIO()
+export_df[["time", "temperature", "humidity"]].to_csv(
+    output,
+    index=False,
+    sep=";"
+)
+
+csv_data = output.getvalue()
 
 st.download_button(
-    label     = "⬇️ Download CSV",
-    data      = csv,
-    file_name = "toprak_verisi.csv",
-    mime      = "text/csv",
+    label="⬇️ Download CSV",
+    data=csv_data,
+    file_name="toprak_verisi.csv",
+    mime="text/csv"
 )
 
 
