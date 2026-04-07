@@ -378,60 +378,64 @@ st.plotly_chart(fig3, use_container_width=True)
 # ---------------- VERİ TABLOSU & CSV İNDİR ----------------
 st.subheader("📋 Veri Tablosu")
 
+# ✅ إعداد DataFrame للعرض
 display_df = df_filtered[["time", "temperature", "moisture"]].copy()
 display_df["time"] = display_df["time"].dt.strftime("%Y-%m-%d %H:%M:%S")
 display_df = display_df.reset_index(drop=True)
 
-rows_html = ""
-for i, row in display_df.iterrows():
-    bg = "#1e1e1e" if i % 2 == 0 else "#2a2a2a"
-    rows_html += f"""
-    <tr style="background:{bg};">
-        <td style="padding:10px 14px; color:#cccccc; font-size:0.85rem;">{i}</td>
-        <td style="padding:10px 14px; color:#ffffff; font-size:0.9rem;">{row['time']}</td>
-        <td style="padding:10px 14px; color:#ffffff; font-size:0.9rem; text-align:right;">{row['temperature']}</td>
-        <td style="padding:10px 14px; color:#ffffff; font-size:0.9rem; text-align:right;">{row['moisture']}</td>
-    </tr>
-    """
+# ✅ تنسيق الجدول عبر Pandas Styler (يعمل بشكل موثوق في Streamlit)
+styled = (
+    display_df.style
+    .set_properties(**{
+        "background-color": "#1e1e1e",
+        "color": "#ffffff",
+        "font-size": "14px",
+    })
+    .set_table_styles([
+        {
+            "selector": "thead tr th",
+            "props": [
+                ("background-color", "#111111"),
+                ("color", "#aaaaaa"),
+                ("font-weight", "600"),
+                ("font-size", "13px"),
+                ("padding", "10px 14px"),
+            ],
+        },
+        {
+            "selector": "tbody tr:nth-child(even)",
+            "props": [("background-color", "#2a2a2a")],
+        },
+        {
+            "selector": "tbody tr:nth-child(odd)",
+            "props": [("background-color", "#1e1e1e")],
+        },
+        {
+            "selector": "tbody tr:hover",
+            "props": [("background-color", "#2d4a1e")],
+        },
+        {
+            "selector": "td",
+            "props": [("padding", "10px 14px"), ("color", "#ffffff")],
+        },
+    ])
+    .format({"temperature": "{:.1f}", "moisture": "{:.2f}"})
+)
 
-# ✅ الإصلاح: تصحيح اسم العمود من humidity إلى moisture
-table_html = f"""
-<div style="
-    background: #111111;
-    border-radius: 12px;
-    overflow: hidden;
-    border: 1px solid #333333;
-    margin-bottom: 1rem;
-">
-    <table style="width:100%; border-collapse:collapse;">
-        <thead>
-            <tr style="background:#1a1a1a; border-bottom: 1px solid #444;">
-                <th style="padding:12px 14px; color:#aaaaaa; font-weight:600; text-align:left; font-size:0.85rem;"></th>
-                <th style="padding:12px 14px; color:#aaaaaa; font-weight:600; text-align:left; font-size:0.85rem;">time</th>
-                <th style="padding:12px 14px; color:#aaaaaa; font-weight:600; text-align:right; font-size:0.85rem;">temperature</th>
-                <th style="padding:12px 14px; color:#aaaaaa; font-weight:600; text-align:right; font-size:0.85rem;">moisture</th>
-            </tr>
-        </thead>
-        <tbody>
-            {rows_html}
-        </tbody>
-    </table>
-</div>
-"""
+st.dataframe(display_df, use_container_width=True, hide_index=False)
 
-st.markdown(table_html, unsafe_allow_html=True)
-
-# CSV İndir
-export_df = df_filtered.copy()
+# ✅ CSV بثلاثة أعمدة منفصلة: time ; temperature ; moisture
+export_df = df_filtered[["time", "temperature", "moisture"]].copy()
 export_df["time"] = export_df["time"].dt.strftime("%Y-%m-%d %H:%M:%S")
+export_df.columns = ["time", "temperature", "moisture"]
 
-csv = export_df[["time", "temperature", "moisture"]].to_csv(index=False, sep=";")
+csv = export_df.to_csv(index=False, sep=";")
 
 st.download_button(
-    "⬇ Download CSV",
-    csv,
-    "soil_data.csv",
-    "text/csv"
+    label="⬇ Download CSV",
+    data=csv,
+    file_name="soil_data.csv",
+    mime="text/csv",
 )
 
 # ---------------- ALT BİLGİ ----------------
