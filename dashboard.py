@@ -17,31 +17,13 @@ st.set_page_config(
 # ---------------- ÖZEL CSS (Toprak & Bitki Teması) ----------------
 st.markdown("""
 <style>
-    /* ── Genel Arka Plan ── */
-    .stApp {
-        background-color: #f5f0e8;
-    }
-
-    /* ── Kenar Çubuğu ── */
-    section[data-testid="stSidebar"] {
-        background-color: #2d4a1e;
-    }
-    section[data-testid="stSidebar"] * {
-        color: #d4e8b0 !important;
-    }
+    .stApp { background-color: #f5f0e8; }
+    section[data-testid="stSidebar"] { background-color: #2d4a1e; }
+    section[data-testid="stSidebar"] * { color: #d4e8b0 !important; }
     section[data-testid="stSidebar"] .stDateInput label,
-    section[data-testid="stSidebar"] h2 {
-        color: #a8d47a !important;
-        font-weight: 700;
-    }
-
-    /* ── Genel Metin Rengi ── */
+    section[data-testid="stSidebar"] h2 { color: #a8d47a !important; font-weight: 700; }
     .stApp, .stApp p, .stApp span, .stApp div,
-    .stApp label, .stApp li, .stApp td, .stApp th {
-        color: #111111 !important;
-    }
-
-    /* ── Metrik Kartları ── */
+    .stApp label, .stApp li, .stApp td, .stApp th { color: #111111 !important; }
     div[data-testid="metric-container"] {
         background-color: #ffffff;
         border: 1.5px solid #7a9e4a;
@@ -49,49 +31,14 @@ st.markdown("""
         padding: 1.2rem 1.5rem;
         box-shadow: 0 2px 8px rgba(74, 90, 30, 0.10);
     }
-    div[data-testid="metric-container"] label {
-        color: #111111 !important;
-        font-weight: 600;
-        font-size: 1rem;
-    }
-    div[data-testid="metric-container"] div[data-testid="stMetricValue"] {
-        color: #111111 !important;
-        font-size: 2rem !important;
-        font-weight: 700;
-    }
-
-    /* ── Alt Başlıklar ── */
-    h2, h3 {
-        color: #111111 !important;
-        border-left: 5px solid #7a9e4a;
-        padding-left: 10px;
-    }
-
-    /* ── Ana Başlık ── */
-    h1 {
-        color: #111111 !important;
-    }
-
-    /* ── Markdown metinler ── */
-    .stMarkdown, .stMarkdown p, .stMarkdown span {
-        color: #111111 !important;
-    }
-
-    /* ── Uyarı & Hata Mesajları ── */
-    .stAlert p, .stAlert div, .stAlert span {
-        color: #111111 !important;
-    }
-
-    /* ── Tablo ── */
-    .stDataFrame {
-        border: 1px solid #a8c47a;
-        border-radius: 10px;
-        overflow: hidden;
-    }
-
-    /* ── İndirme & Çıkış Butonu ── */
-    .stDownloadButton > button,
-    .stButton > button {
+    div[data-testid="metric-container"] label { color: #111111 !important; font-weight: 600; font-size: 1rem; }
+    div[data-testid="metric-container"] div[data-testid="stMetricValue"] { color: #111111 !important; font-size: 2rem !important; font-weight: 700; }
+    h2, h3 { color: #111111 !important; border-left: 5px solid #7a9e4a; padding-left: 10px; }
+    h1 { color: #111111 !important; }
+    .stMarkdown, .stMarkdown p, .stMarkdown span { color: #111111 !important; }
+    .stAlert p, .stAlert div, .stAlert span { color: #111111 !important; }
+    .stDataFrame { border: 1px solid #a8c47a; border-radius: 10px; overflow: hidden; }
+    .stDownloadButton > button, .stButton > button {
         background-color: #4a7c2a !important;
         color: #ffffff !important;
         border: none !important;
@@ -100,18 +47,11 @@ st.markdown("""
         padding: 0.4rem 1.2rem;
         transition: background 0.2s;
     }
-    .stDownloadButton > button:hover,
-    .stButton > button:hover {
+    .stDownloadButton > button:hover, .stButton > button:hover {
         background-color: #2d4a1e !important;
         color: #ffffff !important;
     }
-
-    /* ── Ayırıcı ── */
-    hr {
-        border-color: #c5a96a !important;
-    }
-
-    /* ── Giriş Alanları ── */
+    hr { border-color: #c5a96a !important; }
     .stTextInput > div > input {
         border: 1px solid #7a9e4a !important;
         border-radius: 8px !important;
@@ -220,14 +160,13 @@ if not data:
 
 
 # ---------------- DATAFRAME ----------------
-# Veri yapısı: key = "2026-04-06_10:00:00", value = {moisture, temperature, time}
 records = []
 for key, value in data.items():
     if isinstance(value, dict):
         records.append({
             "time":        key,
             "temperature": value.get("temperature"),
-            "moisture":    value.get("moisture"),   # Firebase'de "moisture" olarak geliyor
+            "moisture":    value.get("moisture"),
         })
 
 df = pd.DataFrame(records)
@@ -236,7 +175,6 @@ if df.empty:
     st.error("❌ Sensörlerden geçerli okuma bulunamadı")
     st.stop()
 
-# Anahtar formatı: "2026-04-06_10:00:00"
 df["time"] = pd.to_datetime(df["time"], format="%Y-%m-%d_%H:%M:%S")
 df = df.sort_values("time")
 
@@ -244,7 +182,6 @@ df = df.sort_values("time")
 # ---------------- SON DEĞERLER ----------------
 latest = df.iloc[-1]
 
-# Nem değerine göre toprak durumu sınıflandırması
 moisture_val = latest["moisture"]
 if moisture_val < 30:
     soil_status = "🏜️ Kuru — Sulama Gerekiyor"
@@ -276,9 +213,9 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 col1, col2, col3 = st.columns(3)
-col1.metric("🌡️ Toprak Sıcaklığı",    f"{latest['temperature']} °C")
-col2.metric("💧 Toprak Nemi",           f"{moisture_val} %")
-col3.metric("📊 Toplam Okuma Sayısı",   f"{len(df)} okuma")
+col1.metric("🌡️ Toprak Sıcaklığı",  f"{latest['temperature']} °C")
+col2.metric("💧 Toprak Nemi",         f"{moisture_val} %")
+col3.metric("📊 Toplam Okuma Sayısı", f"{len(df)} okuma")
 
 st.divider()
 
@@ -309,19 +246,30 @@ st.sidebar.markdown(f"""
 """, unsafe_allow_html=True)
 
 
-# ── Grafik Renkleri ──
+# ── ألوان الرسوم البيانية ──
 SOIL_BROWN  = "#8b6914"
 PLANT_GREEN = "#4a7c2a"
 PAPER_BG    = "#faf7f0"
 GRID_COLOR  = "#ddd5c0"
 FONT_COLOR  = "#111111"
 
-CHART_LAYOUT = dict(
+# CHART_LAYOUT بدون yaxis لتجنب التعارض مع fig3
+BASE_LAYOUT = dict(
     paper_bgcolor = PAPER_BG,
     plot_bgcolor  = PAPER_BG,
     font          = dict(color=FONT_COLOR, family="Arial, sans-serif"),
     xaxis         = dict(gridcolor=GRID_COLOR, showgrid=True),
     yaxis         = dict(gridcolor=GRID_COLOR, showgrid=True),
+    margin        = dict(l=40, r=20, t=50, b=40),
+    hoverlabel    = dict(bgcolor="#2d4a1e", font_color="#d4e8b0"),
+)
+
+# Layout مخصص لـ fig3 (بدون yaxis الافتراضي لأنه يُعرَّف يدوياً)
+DUAL_AXIS_LAYOUT = dict(
+    paper_bgcolor = PAPER_BG,
+    plot_bgcolor  = PAPER_BG,
+    font          = dict(color=FONT_COLOR, family="Arial, sans-serif"),
+    xaxis         = dict(gridcolor=GRID_COLOR, showgrid=True),
     margin        = dict(l=40, r=20, t=50, b=40),
     hoverlabel    = dict(bgcolor="#2d4a1e", font_color="#d4e8b0"),
 )
@@ -342,8 +290,8 @@ fig1.add_trace(go.Scatter(
     fillcolor = "rgba(139, 105, 20, 0.10)",
 ))
 fig1.update_layout(
-    title = "🌡️ Sıcaklık Değişimi",
-    **CHART_LAYOUT
+    title="🌡️ Sıcaklık Değişimi",
+    **BASE_LAYOUT
 )
 fig1.update_yaxes(title_text="°C", title_font_color=SOIL_BROWN)
 st.plotly_chart(fig1, use_container_width=True)
@@ -363,8 +311,6 @@ fig2.add_trace(go.Scatter(
     fill = "tozeroy",
     fillcolor = "rgba(74, 124, 42, 0.10)",
 ))
-
-# İdeal seviye referans çizgileri
 fig2.add_hline(
     y=60, line_dash="dot",
     line_color="#c0392b", opacity=0.5,
@@ -380,8 +326,8 @@ fig2.add_hline(
     annotation_font_color="#e67e22",
 )
 fig2.update_layout(
-    title = "💧 Toprak Nemi Değişimi",
-    **CHART_LAYOUT
+    title="💧 Toprak Nemi Değişimi",
+    **BASE_LAYOUT
 )
 fig2.update_yaxes(title_text="%", title_font_color=PLANT_GREEN)
 st.plotly_chart(fig2, use_container_width=True)
@@ -407,23 +353,24 @@ fig3.add_trace(go.Scatter(
     mode = "lines",
     yaxis = "y2",
 ))
+# ✅ الإصلاح: استخدام DUAL_AXIS_LAYOUT بدلاً من BASE_LAYOUT لتجنب تعارض yaxis
 fig3.update_layout(
-    yaxis  = dict(
-        title      = "Sıcaklık °C",
-        title_font = dict(color=SOIL_BROWN),
-        tickfont   = dict(color=SOIL_BROWN),
-        gridcolor  = GRID_COLOR,
+    **DUAL_AXIS_LAYOUT,
+    yaxis=dict(
+        title="Sıcaklık °C",
+        title_font=dict(color=SOIL_BROWN),
+        tickfont=dict(color=SOIL_BROWN),
+        gridcolor=GRID_COLOR,
     ),
-    yaxis2 = dict(
-        title      = "Nem %",
-        overlaying = "y",
-        side       = "right",
-        title_font = dict(color=PLANT_GREEN),
-        tickfont   = dict(color=PLANT_GREEN),
+    yaxis2=dict(
+        title="Nem %",
+        overlaying="y",
+        side="right",
+        title_font=dict(color=PLANT_GREEN),
+        tickfont=dict(color=PLANT_GREEN),
     ),
-    legend  = dict(orientation="h", y=1.1),
-    barmode = "overlay",
-    **CHART_LAYOUT
+    legend=dict(orientation="h", y=1.1),
+    barmode="overlay",
 )
 st.plotly_chart(fig3, use_container_width=True)
 
@@ -431,13 +378,10 @@ st.plotly_chart(fig3, use_container_width=True)
 # ---------------- VERİ TABLOSU & CSV İNDİR ----------------
 st.subheader("📋 Veri Tablosu")
 
-# Tabloyu hazırla
 display_df = df_filtered[["time", "temperature", "moisture"]].copy()
 display_df["time"] = display_df["time"].dt.strftime("%Y-%m-%d %H:%M:%S")
-display_df.columns = ["time", "temperature", "moisture"]
 display_df = display_df.reset_index(drop=True)
 
-# Koyu arka planlı, referans görsele benzer özel tablo
 rows_html = ""
 for i, row in display_df.iterrows():
     bg = "#1e1e1e" if i % 2 == 0 else "#2a2a2a"
@@ -446,10 +390,11 @@ for i, row in display_df.iterrows():
         <td style="padding:10px 14px; color:#cccccc; font-size:0.85rem;">{i}</td>
         <td style="padding:10px 14px; color:#ffffff; font-size:0.9rem;">{row['time']}</td>
         <td style="padding:10px 14px; color:#ffffff; font-size:0.9rem; text-align:right;">{row['temperature']}</td>
-        <td style="padding:10px 14px; color:#ffffff; font-size:0.9rem; text-align:right;">{row['humidity']}</td>
+        <td style="padding:10px 14px; color:#ffffff; font-size:0.9rem; text-align:right;">{row['moisture']}</td>
     </tr>
     """
 
+# ✅ الإصلاح: تصحيح اسم العمود من humidity إلى moisture
 table_html = f"""
 <div style="
     background: #111111;
@@ -464,7 +409,7 @@ table_html = f"""
                 <th style="padding:12px 14px; color:#aaaaaa; font-weight:600; text-align:left; font-size:0.85rem;"></th>
                 <th style="padding:12px 14px; color:#aaaaaa; font-weight:600; text-align:left; font-size:0.85rem;">time</th>
                 <th style="padding:12px 14px; color:#aaaaaa; font-weight:600; text-align:right; font-size:0.85rem;">temperature</th>
-                <th style="padding:12px 14px; color:#aaaaaa; font-weight:600; text-align:right; font-size:0.85rem;">humidity</th>
+                <th style="padding:12px 14px; color:#aaaaaa; font-weight:600; text-align:right; font-size:0.85rem;">moisture</th>
             </tr>
         </thead>
         <tbody>
@@ -476,18 +421,16 @@ table_html = f"""
 
 st.markdown(table_html, unsafe_allow_html=True)
 
-# CSV İndir butonu
+# CSV İndir
 export_df = df_filtered.copy()
 export_df["time"] = export_df["time"].dt.strftime("%Y-%m-%d %H:%M:%S")
 
-csv = export_df[
-    ["time", "temperature", "moisture"]
-].to_csv(index=False, sep=";")
+csv = export_df[["time", "temperature", "moisture"]].to_csv(index=False, sep=";")
 
 st.download_button(
     "⬇ Download CSV",
     csv,
-    "dht_data.csv",
+    "soil_data.csv",
     "text/csv"
 )
 
