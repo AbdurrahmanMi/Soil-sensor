@@ -407,46 +407,85 @@ fig3.add_trace(go.Scatter(
     yaxis = "y2",
 ))
 fig3.update_layout(
-    yaxis  = dict(title="Sıcaklık °C", titlefont_color=SOIL_BROWN,
-                  tickfont_color=SOIL_BROWN, gridcolor=GRID_COLOR),
-    yaxis2 = dict(title="Nem %", overlaying="y", side="right",
-                  titlefont_color=PLANT_GREEN, tickfont_color=PLANT_GREEN),
-    legend = dict(orientation="h", y=1.1),
+    yaxis  = dict(
+        title      = "Sıcaklık °C",
+        title_font = dict(color=SOIL_BROWN),
+        tickfont   = dict(color=SOIL_BROWN),
+        gridcolor  = GRID_COLOR,
+    ),
+    yaxis2 = dict(
+        title      = "Nem %",
+        overlaying = "y",
+        side       = "right",
+        title_font = dict(color=PLANT_GREEN),
+        tickfont   = dict(color=PLANT_GREEN),
+    ),
+    legend  = dict(orientation="h", y=1.1),
     barmode = "overlay",
     **CHART_LAYOUT
 )
 st.plotly_chart(fig3, use_container_width=True)
 
 
-# ---------------- VERİ TABLOSU ----------------
-st.subheader("📋 Ayrıntılı Okuma Tablosu")
+# ---------------- VERİ TABLOSU & CSV İNDİR ----------------
+st.subheader("📋 Veri Tablosu")
 
+# Tabloyu hazırla
 display_df = df_filtered[["time", "temperature", "humidity"]].copy()
-display_df.columns = ["🕒 Zaman", "🌡️ Sıcaklık (°C)", "💧 Nem (%)"]
-display_df["🕒 Zaman"] = display_df["🕒 Zaman"].dt.strftime("%Y-%m-%d %H:%M:%S")
+display_df["time"] = display_df["time"].dt.strftime("%Y-%m-%d %H:%M:%S")
+display_df.columns = ["time", "temperature", "humidity"]
+display_df = display_df.reset_index(drop=True)
 
-st.dataframe(
-    display_df,
-    use_container_width=True,
-    hide_index=True,
-)
+# Koyu arka planlı, referans görsele benzer özel tablo
+rows_html = ""
+for i, row in display_df.iterrows():
+    bg = "#1e1e1e" if i % 2 == 0 else "#2a2a2a"
+    rows_html += f"""
+    <tr style="background:{bg};">
+        <td style="padding:10px 14px; color:#cccccc; font-size:0.85rem;">{i}</td>
+        <td style="padding:10px 14px; color:#ffffff; font-size:0.9rem;">{row['time']}</td>
+        <td style="padding:10px 14px; color:#ffffff; font-size:0.9rem; text-align:right;">{row['temperature']}</td>
+        <td style="padding:10px 14px; color:#ffffff; font-size:0.9rem; text-align:right;">{row['humidity']}</td>
+    </tr>
+    """
 
+table_html = f"""
+<div style="
+    background: #111111;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #333333;
+    margin-bottom: 1rem;
+">
+    <table style="width:100%; border-collapse:collapse;">
+        <thead>
+            <tr style="background:#1a1a1a; border-bottom: 1px solid #444;">
+                <th style="padding:12px 14px; color:#aaaaaa; font-weight:600; text-align:left; font-size:0.85rem;"></th>
+                <th style="padding:12px 14px; color:#aaaaaa; font-weight:600; text-align:left; font-size:0.85rem;">time</th>
+                <th style="padding:12px 14px; color:#aaaaaa; font-weight:600; text-align:right; font-size:0.85rem;">temperature</th>
+                <th style="padding:12px 14px; color:#aaaaaa; font-weight:600; text-align:right; font-size:0.85rem;">humidity</th>
+            </tr>
+        </thead>
+        <tbody>
+            {rows_html}
+        </tbody>
+    </table>
+</div>
+"""
 
-# ---------------- CSV DIŞA AKTARMA ----------------
+st.markdown(table_html, unsafe_allow_html=True)
+
+# CSV İndir butonu
 export_df = df_filtered.copy()
 export_df["time"] = export_df["time"].dt.strftime("%Y-%m-%d %H:%M:%S")
-csv = export_df[["time", "temperature", "humidity"]].to_csv(
-    index=False, sep=";"
-)
+csv = export_df[["time", "temperature", "humidity"]].to_csv(index=False, sep=";")
 
-col_a, col_b = st.columns([3, 1])
-with col_b:
-    st.download_button(
-        label    = "⬇️ CSV İndir",
-        data     = csv,
-        file_name= "toprak_verisi.csv",
-        mime     = "text/csv",
-    )
+st.download_button(
+    label     = "⬇️ Download CSV",
+    data      = csv,
+    file_name = "toprak_verisi.csv",
+    mime      = "text/csv",
+)
 
 
 # ---------------- ALT BİLGİ ----------------
