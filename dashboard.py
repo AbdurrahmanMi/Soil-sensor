@@ -227,7 +227,7 @@ for key, value in data.items():
         records.append({
             "time":        key,
             "temperature": value.get("temperature"),
-            "humidity":    value.get("moisture"),   # Firebase'de "moisture" olarak geliyor
+            "moisture":    value.get("moisture"),   # Firebase'de "moisture" olarak geliyor
         })
 
 df = pd.DataFrame(records)
@@ -245,11 +245,11 @@ df = df.sort_values("time")
 latest = df.iloc[-1]
 
 # Nem değerine göre toprak durumu sınıflandırması
-humidity_val = latest["humidity"]
-if humidity_val < 30:
+moisture_val = latest["moisture"]
+if moisture_val < 30:
     soil_status = "🏜️ Kuru — Sulama Gerekiyor"
     status_color = "#c0392b"
-elif humidity_val < 60:
+elif moisture_val < 60:
     soil_status = "✅ İdeal — Sağlıklı"
     status_color = "#27ae60"
 else:
@@ -277,7 +277,7 @@ st.markdown(f"""
 
 col1, col2, col3 = st.columns(3)
 col1.metric("🌡️ Toprak Sıcaklığı",    f"{latest['temperature']} °C")
-col2.metric("💧 Toprak Nemi",           f"{humidity_val} %")
+col2.metric("💧 Toprak Nemi",           f"{moisture_val} %")
 col3.metric("📊 Toplam Okuma Sayısı",   f"{len(df)} okuma")
 
 st.divider()
@@ -355,7 +355,7 @@ st.subheader("💧 Zaman İçinde Toprak Nemi")
 fig2 = go.Figure()
 fig2.add_trace(go.Scatter(
     x    = df_filtered["time"],
-    y    = df_filtered["humidity"],
+    y    = df_filtered["moisture"],
     mode = "lines+markers",
     name = "Nem %",
     line = dict(color=PLANT_GREEN, width=2.5),
@@ -401,7 +401,7 @@ fig3.add_trace(go.Bar(
 ))
 fig3.add_trace(go.Scatter(
     x    = df_filtered["time"],
-    y    = df_filtered["humidity"],
+    y    = df_filtered["moisture"],
     name = "Nem %",
     line = dict(color=PLANT_GREEN, width=2.5),
     mode = "lines",
@@ -432,9 +432,9 @@ st.plotly_chart(fig3, use_container_width=True)
 st.subheader("📋 Veri Tablosu")
 
 # Tabloyu hazırla
-display_df = df_filtered[["time", "temperature", "humidity"]].copy()
+display_df = df_filtered[["time", "temperature", "moisture"]].copy()
 display_df["time"] = display_df["time"].dt.strftime("%Y-%m-%d %H:%M:%S")
-display_df.columns = ["time", "temperature", "humidity"]
+display_df.columns = ["time", "temperature", "moisture"]
 display_df = display_df.reset_index(drop=True)
 
 # Koyu arka planlı, referans görsele benzer özel tablo
@@ -477,22 +477,19 @@ table_html = f"""
 st.markdown(table_html, unsafe_allow_html=True)
 
 # CSV İndir butonu
-utput = io.StringIO()
-export_df[["time", "temperature", "humidity"]].to_csv(
-    output,
-    index=False,
-    sep=";"
-)
+export_df = df_filtered.copy()
+export_df["time"] = export_df["time"].dt.strftime("%Y-%m-%d %H:%M:%S")
 
-csv_data = output.getvalue()
+csv = export_df[
+    ["time", "temperature", "moisture"]
+].to_csv(index=False, sep=";")
 
 st.download_button(
-    label="⬇️ Download CSV",
-    data=csv_data,
-    file_name="toprak_verisi.csv",
-    mime="text/csv"
+    "⬇ Download CSV",
+    csv,
+    "dht_data.csv",
+    "text/csv"
 )
-
 
 # ---------------- ALT BİLGİ ----------------
 st.markdown("""
